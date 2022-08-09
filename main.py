@@ -2,9 +2,9 @@ from pprint import pprint
 
 
 from csv_enum import CsvEnum
-from handlers import get_rows, get_columns, get_days_with_objects, get_day_with_min_or_max_temp, \
-    get_days_with_average_temperature, get_month, get_months_with_average_temp_for_month, \
-    get_month_with_min_or_max_temp, get_months_with_average_temp_for_days
+from handlers import (get_rows, get_columns, get_days_with_objects, get_day_with_min_or_max_temp,
+    get_days_with_average_temperature, get_month, get_months_with_average_value_for_month,
+    get_month_with_min_or_max_temp, get_months_with_average_temp_for_days)
 
 enum = CsvEnum
 
@@ -32,10 +32,11 @@ for line in reader:
     if not line:
         break
     r = Row()
-    for i, attr in enumerate(line):
-        if i == 29:
-            break
-        setattr(r, cols[i], line[i])
+    for i, attr in enumerate(line, start=0):
+        try:
+            setattr(r, cols[i], line[i])
+        except IndexError:
+            continue
     rows.append(r)
 
 
@@ -47,8 +48,10 @@ class WeatherStatistic:
         day_objects = get_days_with_objects(objects=rows)
         months_with_average_temp = get_months_with_average_temp_for_days(day_objects=day_objects,
                                                                          month_dict=month_dict)
-        months_with_average_temp_for_month = get_months_with_average_temp_for_month(months_with_average_temp)
+        months_with_average_temp_for_month = get_months_with_average_value_for_month(months_with_average_temp)
         return months_with_average_temp_for_month
+
+
 
     def get_coldest_month(self):
         months_with_average_temp_for_month = self.getting_months_with_average_temp_month()
@@ -56,6 +59,28 @@ class WeatherStatistic:
                                                                 month_dict=months_with_average_temp_for_month)
         return (f"Coldest month:\n Month: {date_with_coldest_temp[0]}, "
                 f"Average temperature: {date_with_coldest_temp[1]}")
+
+
+# """
+# Самый ветреный месяц
+
+# Разбить на месяца
+# 1. разбить на дни
+# 2. для каждого дня получить среднюю скорость ветра
+# 3. разбить на месяца
+# 4. для каждого месяца получить среднюю скорость ветра
+# 5. max(array(в котором все месяца в csv)
+
+# """
+
+    # def find_windiest_month():
+    #     months_with_average_temp_for_month = self.getting_months_with_average_temp_month()
+    #     date_with_coldest_temp = get_month_with_min_or_max_temp(func=min,
+    #                                                             month_dict=months_with_average_temp_for_month)
+    #     return (f"Coldest month:\n Month: {date_with_coldest_temp[0]}, "
+    #             f"Average temperature: {date_with_coldest_temp[1]}")
+
+        
 
     @staticmethod
     def get_coldest_day():
@@ -66,11 +91,13 @@ class WeatherStatistic:
         return (f"Coldest day: Day: {coldest_day[0]}, " 
                 f"Average temperature: {coldest_day[1]}")
 
+
+
     def get_hottest_month(self):
         months_with_average_temp_for_month = self.getting_months_with_average_temp_month()
         date_with_hottest_temp = get_month_with_min_or_max_temp(func=max,
                                                                 month_dict=months_with_average_temp_for_month)
-        return (f"Coldest month:\n Month: {date_with_hottest_temp[0]}, "
+        return (f"Hottest month:\n Month: {date_with_hottest_temp[0]}, "
                 f"Average temperature: {date_with_hottest_temp[1]}")
 
     @staticmethod
@@ -97,6 +124,4 @@ if __name__ == "__main__":
     pprint('_________MONTH___________')
     pprint(weather.get_coldest_month())
     pprint(weather.get_hottest_month())
-    # pprint('_________WEEK___________')
-
-    # print('_________MONTH_________')
+    pprint('_________WEEK___________')

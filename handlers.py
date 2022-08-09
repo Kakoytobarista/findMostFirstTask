@@ -23,12 +23,15 @@ def get_rows() -> list:
 def get_average_temperature(objects: collections.Iterable,
                             len_interval: int) -> float:
     """Function for getting average temperature"""
-    avg_temp = 0
-    for i in objects:
-        avg_temp += float(i.t)
+    avg_temp = sum([float(day.t) for day in objects]) // len_interval
+    return avg_temp
 
-    result = avg_temp // len_interval
-    return result
+
+def get_average_wind(objects: collections.Iterable,
+                            len_interval: int) -> float:
+    """Function for getting average temperature"""
+    avg_wind = sum([float(day.ff) for day in objects]) // len_interval
+    return avg_wind
 
 
 def get_days_with_objects(objects: collections.Iterable) -> dict:
@@ -37,7 +40,18 @@ def get_days_with_objects(objects: collections.Iterable) -> dict:
     day_dict = defaultdict(list)
     for i in objects:
         day_dict[i.time[:-6]].append(i)
+    
     return day_dict
+
+
+def get_month(arr: List[Any]) -> dict:
+    """Getting dict with key: month
+    and value: zero"""
+    month_dict = defaultdict(list)
+    for i in arr:
+        month_dict[i.time[3:-6]].append(0)
+
+    return month_dict
 
 
 def get_days_with_average_temperature(array: dict) -> dict:
@@ -58,14 +72,6 @@ def get_day_with_min_or_max_temp(func: Union[min, max],
     return func(array.items(), key=lambda x: x[1])
 
 
-def get_month(arr: List[Any]) -> dict:
-    """Getting dict with key: month
-    and value: zero"""
-    month_dict = defaultdict(list)
-    for i in arr:
-        month_dict[i.time[3:-6]].append(0)
-
-    return month_dict
 
 
 def get_months_with_average_temp_for_days(day_objects: dict,
@@ -78,8 +84,8 @@ def get_months_with_average_temp_for_days(day_objects: dict,
     return month_dict
 
 
-def get_months_with_average_temp_for_month(month_dict: Dict) -> dict:
-    """Getting date (month interval) with average temperature
+def get_months_with_average_value_for_month(month_dict: Dict) -> dict:
+    """Getting date (month interval) with average value
     for months"""
     result = {}
     for key, value in month_dict.items():
@@ -91,4 +97,3 @@ def get_month_with_min_or_max_temp(func: Any, month_dict) -> Any:
     """Getting month with minimal or maximum
     temperature"""
     return func(month_dict.items(), key=lambda x: x[1])
-
