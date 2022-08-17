@@ -9,16 +9,26 @@ from helpers import is_number
 
 def get_columns() -> list:
     """Function for getting columns from csv"""
-    with open(CsvEnum.PATH_TO_DATA.value) as csv_data:
-        reader = csv.reader(csv_data, delimiter=';')
-        return [i.lower() for i in next(reader)]
+    try:
+        with open(CsvEnum.PATH_TO_DATA.value) as csv_data:
+            reader = csv.reader(csv_data, delimiter=';')
+            return [i.lower() for i in next(reader)]
+    except IOError as err:
+        return err
+    finally:
+        csv_data.close()
 
 
 def get_rows() -> list:
     """Function for getting rows from csv"""
-    with open(CsvEnum.PATH_TO_DATA.value) as csv_data:
-        reader = csv.reader(csv_data, delimiter=';')
-        return list(reader)[1:]
+    try:
+        with open(CsvEnum.PATH_TO_DATA.value) as csv_data:
+            reader = csv.reader(csv_data, delimiter=';')
+            return list(reader)[1:]
+    except IOError as err:
+        return err
+    finally:
+        csv_data.close()
 
 
 def get_average_temperature(objects: collections.Iterable,
@@ -52,7 +62,7 @@ def get_days_with_objects(objects: collections.Iterable) -> dict:
     day_dict = defaultdict(list)
     for i in objects:
         day_dict[i.time[:-6]].append(i)
-    
+
     return day_dict
 
 
@@ -93,7 +103,8 @@ def get_days_with_average_rainy(days: dict) -> dict:
     and value average temperature"""
     avg_day = {}
     for key, value in days.items():
-        avg_day[key] = (get_average_rainy(objects=value, len_interval=len(days[key])))
+        avg_day[key] = (get_average_rainy(objects=value,
+                                          len_interval=len(days[key])))
 
     return avg_day
 
